@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en, ua" style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <title>Shugaring</title>
+    <link rel="stylesheet" href="public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="public/css/datepicker.css">
+    <link rel="stylesheet" href="public/css/foter.css">
+    <link href="https://unpkg.com/ionicons@4.4.7/dist/css/ionicons.min.css" rel="stylesheet">
+    
+   
+    
+</head>
+<body style="background-color: #FFFFFF; height: 100%;">
+<br>
+<div>
+<h1 style="text-align: center">Add Master</h1>
+<div class="container" style="margin-bottom: 100px;">
+    <div class="row" style="justify-content: center; align-items: center;">
+        <div class="col-4">
+            <form id="addMasterForm">
+                    <div class="form-group" style="margin-top: 70px;">
+                            <label for="inputId">ID</label> 
+                            <input type="text" class="form-control" id="inputId" aria-describedby="fNameHelp" placeholder="Enter Id">
+                         </div>
+               <div class="form-group">
+                  <label for="inputFirstname">First name</label> 
+                  <input type="text" class="form-control" id="inputFirstName" aria-describedby="fNameHelp" placeholder="Enter FirstName">
+               </div>
+                <div class="form-group">
+                    <label for="inputLastName">Last name</label>
+                    <input type="text" class="form-control" id="inputLastName" aria-describedby="lNameHelp" placeholder="Enter LastName">
+                </div>
+                <div class="form-group">
+                    <label for="inputPhoneNumber">Phone number</label>
+                    <input type="text" class="form-control" id="inputPhoneNumber" aria-describedby="phoneHelp" placeholder="Enter PhoneNumber">
+                </div>
+
+                <div class="form-group">
+                    <label for="birthday">Birthday</label>
+                   <input type="text" class="form-control" id="birthday" name="daterange" >
+                </div>
+                <div class="form-group">
+                <label class="custom-file form-group">Image
+                      <input type="file" id="image" class="form-control">
+                      <span class="custom-file-control"></span>
+                </label>
+               </div>
+                <div style="text-align: right">
+                    <button type="submit" class="btn btn-success">Add</button>
+                </div>
+                <div style="text-align: right">
+                        <button type="submit" class="btn btn-info">Update</button>
+                    </div>
+                </form>
+        </div>
+    </div>
+</div>
+</div>
+<br>
+<div class="text-center">
+      <h1>Masters</h1>
+      
+      <table class="table" id="mastersTable">
+         <thead>
+            <tr>
+             <th>Id</th>
+             <th>FirstName</th>
+             <th>LastName</th>
+             <th>Phone Number</th>
+             <th>Birthday</th>
+             <th>Image</th>
+             </tr>
+         </thead>
+         <tbody>
+             
+         </tbody>
+          
+      </table>
+  </div>
+
+
+	
+
+
+
+<script type="text/javascript" src="public/js/jquery.min.js"></script>
+<script type="text/javascript" src="public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="public/js/datepicker.js"></script>
+<script src="https://unpkg.com/ionicons@4.4.7/dist/ionicons.js"></script>
+<script type="text/javascript" src="public/js/index.js"></script>
+<script>
+   let serverURL = "http://localhost:8080/masters/";
+   let imgURL = "http://localhost:8080/masters/image?fileName=";
+    $(document).ready(function(){
+         let token = window.localStorage.getItem("auth_token");
+        if(token){
+            $.ajaxSetup({
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+            let role = parseJwt(token).auth;
+            if(role === "ROLE_ADMIN"){
+                $("#superNavbar").append(
+                    `
+                    <li class="nav-item">
+        <a class="nav-link" href="admin.html">Admin</a>
+      </li>
+                    `
+                    )
+            };
+
+
+                $("#addMasterForm").submit(function(e){
+            
+            e.preventDefault();
+            addMaster();
+             
+        })
+
+        getMasters();
+            
+           $('#logoutBtn').on('click', function(e) {
+                    window.localStorage.removeItem('auth_token');
+                    window.location.reload();
+                });
+            } else {
+                window.location.href="masters.html";
+            }
+        
+        
+        $(document).on("click", "#mastersTable tbody button.btnUpdateClass", function(e){
+
+console.log(e.target.id);
+let elementId = e.target.id;
+let masterId = elementId.split("-")[1];
+getMasterByID(masterId);
+
+
+});
+       
+
+
+        
+
+        $('#birthday').datepicker({
+            dateFormat: "yyyy-mm-dd"
+        });
+    });
+
+     function parseJwt(token){
+           var base64Url = token.split(".")[1];
+           var base64 = base64Url.replace('-', '+').replace('_', '/');
+           return JSON.parse(window.atob(base64));
+       }
+
+     function getMasterByID(masterId){
+         $.ajax({
+             url: serverURL + masterId,
+             method: "GET",
+             dataType: "json",
+             contentType: "application/json",
+             success: function(response){
+             document.getElementById("inputId").value=response.id;
+             document.getElementById("inputFirstName").value=response.firstName;
+             document.getElementById("inputLastName").value=response.lastName;
+             document.getElementById("inputPhoneNumber").value=response.phoneNumber;
+             document.getElementById("birthday").value=response.birthday;
+             
+
+             }
+         });
+     }
+
+     function getMasters(){
+        $.ajax({
+            url: serverURL,
+            method: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response){
+                console.log(response);
+                $("#mastersTable tbody").empty;
+                $.each(response, function(key, value){
+                    
+                    $("#mastersTable tbody").append(
+                        `
+                        <tr>
+    
+                        <td>${value.id}</td>    
+                        <td>${value.firstName}</td>    
+                        <td>${value.lastName}</td>    
+                        <td>${value.phoneNumber}</td>    
+                        <td>${value.birthday}</td>  
+                        <td>
+                            <img src="${value.image !== null ? (imgURL + value.image) : ""}" height="70px">
+                        </td> 
+                        <td>
+                        <button class="btn btn-info btnUpdateClass" id="btnUpdate-${value.id}">Update</button>
+                        </td>
+                        
+                        </tr>
+                        `);
+                        
+                       
+                    
+                });
+            }
+        });
+    };
+    
+    
+    
+     function addMaster(){
+        
+        let firstName = $("#inputFirstName").val();
+        let lastName = $("#inputLastName").val();
+        let phoneNumber = $("#inputPhoneNumber").val();
+        let birthday = $("#birthday").val();
+        let masterId; 
+        
+      
+       let master = {
+           
+            firstName: firstName,
+                lastName: lastName,
+                    phoneNumber: phoneNumber,
+                        birthday: birthday,
+                            image: ""
+                            
+                
+        };
+            
+            $.ajax({
+             
+                url: serverURL,
+                method: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(master),
+                complete: function(data){
+                    if(data.status == 201){
+                        alert("Master Added");
+                        $("mastersTable tbody").empty();
+                        getMasters();
+                        
+                        $.ajax({
+                        url: serverURL + phoneNumber + "/phone",
+                         method: 'GET',
+                            dataType: "json",
+                             contentType: "application/json",
+                                success: function(res) {
+                                console.log(res);
+                               masterId = res;
+                               if($("#image")[0].files[0]){
+                                   uploadFile(masterId);
+                               }
+                            }
+            
+                            });
+                    }
+                }
+            });
+
+        
+    }
+
+    function uploadFile(masterId) {
+            let formData = new FormData();
+            formData.append('file', $('#image')[0].files[0]);
+            $.ajax({
+                url: serverURL + masterId + '/image',
+                method: 'POST',
+                contentType: false,
+                processData: false,
+                data: formData,
+                complete: function(res) {
+                    alert("Image added");
+                }
+            })
+        }
+
+   
+   function findByName(masterName) {
+            $.ajax({
+                url: serverURL + 'films/find?filmName=' + masterName,
+                method: 'GET',
+                dataType: "json",
+                contentType: "application/json",
+                success: function(res) {
+                    uploadFile(res.id);
+                    console.log(res);
+                    $('#addFilmForm')[0].reset();
+                }
+            })
+        }
+    </script>
+</body>
+</html>

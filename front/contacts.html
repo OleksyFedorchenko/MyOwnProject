@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en, ua" style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <title>Shugaring</title>
+    <link rel="stylesheet" href="public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="public/css/datepicker.css">
+    <link rel="stylesheet" href="public/css/foter.css">
+    <link href="https://unpkg.com/ionicons@4.4.7/dist/css/ionicons.min.css" rel="stylesheet">
+    
+   
+    <body style="background-color: #fac3e8; height: 100%;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="position: fixed; min-width: 100%; z-index: 1">
+            <a class="navbar-brand" href="index.html">Cosmetology</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav" id="superNavbar">
+                <li class="nav-item">
+                  <a class="nav-link" href="Masters.html">Masters</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="notes.html">Note</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="helpfull.html">Helpfull</a>
+                </li>
+                 <li class="nav-item">
+                  <a class="nav-link" href="contacts.html">Contacts</a>
+                 </li>
+              </ul>
+          </nav>
+            </div>
+          </nav>
+<br>
+
+
+	
+<div id="contacts">	
+<div class="container">
+<div class="myframegmap"> 
+<iframe width="320" height="250" src="https://maps.google.com/maps?width=300&amp;height=225&amp;hl=en&amp;q=%D0%91%D0%BE%D1%80%D1%82%D0%BD%D1%8F%D0%BD%D1%81%D1%8C%D0%BA%D0%BE%D0%B3%D0%BE%2050%2C%20%D0%9B%D1%8C%D0%B2%D0%BE%D0%B2+(Office)&amp;ie=UTF8&amp;t=&amp;z=17&amp;iwloc=B&amp;output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+    </div>
+    </div>
+    
+    
+		<div class="container" style="text-align: left">
+        <h3>Contact Us</h3>
+        <p><b>Tel.Number:</b> +380939224248</p>
+        <p><b>Email:</b>      cjhrxS@gmail.com</p>
+    </div>
+    
+   </div>
+<br>
+	
+
+<div class="footer">
+	
+   
+		<div class="container" style="text-align: center; text-decoration-color: aliceblue">
+			
+			<a href="https://www.facebook.com/profile.php?id=100016259835742&__tn__=%2CdlC-R-R&eid=ARB1FDGnKBOQlVabuFzQi6UVrnjXP0sbI5EstcFpnDYYUgunMMLCACCsNyEPel0fDCCZaYGLQ738-gkI&hc_ref=ARQITm-0tEXs_7D390oh77ahML_ZZNw4GXgxlVTUSA_9teg4EY9_DzCLAv4CiPb52DI"><ion-icon name="logo-facebook"></ion-icon></a>
+			<a href="https://www.instagram.com/sugaring_visk_lviv/?hl=uk"><ion-icon name="logo-instagram"></ion-icon></a>
+			<a href="https://t.me/AnnaHnativ"><ion-icon name="logo-whatsapp"></ion-icon></a>
+			
+			
+
+		</div>
+        
+</div>
+
+<script type="text/javascript" src="public/js/jquery.min.js"></script>
+<script type="text/javascript" src="public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="public/js/datepicker.js"></script>
+<script src="https://unpkg.com/ionicons@4.4.7/dist/ionicons.js"></script>
+<script>
+  $(document).ready(function(){
+        let token = window.localStorage.getItem("auth_token");
+        if(token){
+
+$.ajaxSetup({
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    });
+
+$("#superNavbar").append(
+        `
+        <form class="form-inline">
+<ul class="navbar-nav justify-content-end">
+<li class="nav-item">
+<a href="index.html" id="logoutBtn" class="nav-link">Log out</a>
+</li>
+</ul>
+</form>
+        `
+        )
+
+let role = parseJwt(token).auth;
+if(role === "ROLE_ADMIN"){
+    $("#superNavbar").append(
+        `
+        <li class="nav-item">
+<a class="nav-link" href="admin.html">Admin</a>
+</li>
+        `
+        )
+}
+
+$('#logoutBtn').on('click', function(e) {
+        window.localStorage.removeItem('auth_token');
+        window.location.reload("notes.html");
+    });
+} else {
+    $("#superNavbar").append(
+        `
+        <ul class="navbar-nav justify-content-end">
+            <form class="form-inline">
+         <li class="nav-item">
+            <a href="register.html" class="nav-link">Sign Up</a>
+        </li>
+        <li class="nav-item">
+            <a href="signin.html" class="nav-link">Sign In</a>
+        </li>
+    </form>
+    </ul>
+        `
+        )
+
+}
+        });
+
+         function parseJwt(token){
+           var base64Url = token.split(".")[1];
+           var base64 = base64Url.replace("-", "+").replace("_", "/");
+           return JSON.parse(window.atob(base64));
+       }
+</script>
+</body>
+</html>

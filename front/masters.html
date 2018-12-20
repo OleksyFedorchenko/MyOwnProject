@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <title>Shugaring</title>
+    <link rel="stylesheet" href="public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="public/css/datepicker.css" type="text/css">
+    <link rel="stylesheet" href="public/css/foter.css">
+    <link href="https://unpkg.com/ionicons@4.4.7/dist/css/ionicons.min.css" rel="stylesheet">
+    
+</head>
+<body style="background-color: #fac3e8; height: 100%">
+
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="position: fixed; min-width: 100%; z-index: 1">
+                <a class="navbar-brand" href="index.html">Cosmetology</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                  <ul class="navbar-nav" id="superNavbar">
+                    <li class="nav-item">
+                      <a class="nav-link" href="Masters.html">Masters</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="notes.html">Note</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="helpfull.html">Helpfull</a>
+                    </li>
+                     <li class="nav-item">
+                      <a class="nav-link" href="contacts.html">Contacts</a>
+                     </li>
+                  </ul>
+              </nav>
+                </div>
+              </nav>
+              
+              
+      <br>
+      <form style="margin-top: 70px">
+<div class="flex-container" style="display: flex; flex-direction: row; justify-content: space-around; flex-wrap: wrap;" id="masterForm">
+    
+     
+          
+
+   </div>
+</form>
+<div class="footer">
+	
+   
+		<div class="container" style="text-align: center; text-decoration-color: aliceblue">
+			
+			<a href="https://www.facebook.com/profile.php?id=100016259835742&__tn__=%2CdlC-R-R&eid=ARB1FDGnKBOQlVabuFzQi6UVrnjXP0sbI5EstcFpnDYYUgunMMLCACCsNyEPel0fDCCZaYGLQ738-gkI&hc_ref=ARQITm-0tEXs_7D390oh77ahML_ZZNw4GXgxlVTUSA_9teg4EY9_DzCLAv4CiPb52DI"><ion-icon name="logo-facebook"></ion-icon></a>
+			<a href="https://www.instagram.com/sugaring_visk_lviv/?hl=uk"><ion-icon name="logo-instagram"></ion-icon></a>
+			<a href="https://t.me/AnnaHnativ"><ion-icon name="logo-whatsapp"></ion-icon></a>
+			
+			
+
+		</div>
+        
+</div>
+<script type="text/javascript" src="public/js/jquery.min.js"></script>
+<script type="text/javascript" src="public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="public/js/datepicker.js"></script>
+<script src="https://unpkg.com/ionicons@4.4.7/dist/ionicons.js"></script>
+<script>
+ let serverURL = "http://localhost:8080/masters/";
+   let imgURL = "http://localhost:8080/masters/image?fileName=";
+$(document).ready(function(){
+    getMasters();
+        let token = window.localStorage.getItem("auth_token");
+        if(token){
+
+$.ajaxSetup({
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    });
+
+$("#superNavbar").append(
+        `
+        <form class="form-inline">
+<ul class="navbar-nav justify-content-end">
+<li class="nav-item">
+<a href="index.html" id="logoutBtn" class="nav-link">Log out</a>
+</li>
+</ul>
+</form>
+        `
+        )
+
+let role = parseJwt(token).auth;
+if(role === "ROLE_ADMIN"){
+    $("#superNavbar").append(
+        `
+        <li class="nav-item">
+<a class="nav-link" href="admin.html">Admin</a>
+</li>
+        `
+        )
+}
+
+$('#logoutBtn').on('click', function(e) {
+        window.localStorage.removeItem('auth_token');
+        window.location.reload("notes.html");
+    });
+} else {
+    $("#superNavbar").append(
+        `
+        <ul class="navbar-nav justify-content-end">
+            <form class="form-inline">
+         <li class="nav-item">
+            <a href="register.html" class="nav-link">Sign Up</a>
+        </li>
+        <li class="nav-item">
+            <a href="signin.html" class="nav-link">Sign In</a>
+        </li>
+    </form>
+    </ul>
+        `
+        )
+
+}
+        });
+
+         function parseJwt(token){
+           var base64Url = token.split(".")[1];
+           var base64 = base64Url.replace("-", "+").replace("_", "/");
+           return JSON.parse(window.atob(base64));
+       }
+
+       function getMasters(){
+        $.ajax({
+            url: serverURL,
+            method: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response){
+                console.log(response);
+                $.each(response, function(key, value){
+                    
+                    $("#masterForm").append(
+                        `
+     
+     <div class="card" style="width: 18rem;">
+  <img class="card-img-top" src="${value.image !== null ? (imgURL + value.image) : ''}" width="150px">
+  <div class="card-body">
+    <h5 class="card-title">${value.firstName}</h5>
+    <p class="card-text">${value.lastName}</p>
+ </div>
+</div>
+                        `);
+                        
+                       
+                    
+                });
+            }
+        });
+    };
+</script>
+</body>
+</html>

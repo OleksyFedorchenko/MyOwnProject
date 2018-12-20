@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en, ua" style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <title>Shugaring</title>
+    <link rel="stylesheet" href="public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="public/css/datepicker.css">
+    <link rel="stylesheet" href="public/css/foter.css">
+    <link href="https://unpkg.com/ionicons@4.4.7/dist/css/ionicons.min.css" rel="stylesheet">
+    
+   
+    
+</head>
+<body style="background-color: #FFFFFF; height: 100%;">
+
+    <br>
+
+    <div class="container" style="margin-bottom: 100px;">
+        <div class="row" style="justify-content: center; align-items: center;">
+            <div class="col-4">
+                <form id="register" class="register">
+                        <div class="form-group" style="margin-top: 70px;">
+                                <label for="inputId">Id</label> 
+                                <input type="text" class="form-control checkId" id="inputId" aria-describedby="fNameHelp" placeholder="Enter Id">
+                             </div>
+                   <div class="form-group">
+                      <label for="inputFirstname">First name</label> 
+                      <input type="text" class="form-control" id="inputFirstName" aria-describedby="fNameHelp" placeholder="Enter FirstName">
+                   </div>
+                    <div class="form-group">
+                        <label for="inputLastName">Last name</label>
+                        <input type="text" class="form-control" id="inputLastName" aria-describedby="lNameHelp" placeholder="Enter LastName">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputPhoneNumber">Phone number</label>
+                        <input type="text" class="form-control" id="inputPhoneNumber" aria-describedby="phoneHelp" placeholder="Enter PhoneNumber">
+                    </div>
+    
+                    <div class="form-group">
+                        <label for="birthday">Birthday</label>
+                       <input type="text" class="form-control datepicker-here" id="birthday" name="daterange" >
+                    </div>
+    
+                     <div class="form-group">
+                        <label for="inputEmail">Email</label>
+                        <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" placeholder="Enter Email">
+                    </div>
+                     <div class="form-group">
+                        <label for="inputPassword">Password</label>
+                        <input type="password" class="form-control" id="inputPassword" aria-describedby="passwordlHelp" placeholder="Enter Password">
+                    </div>
+                    <div style="text-align: right">
+                            <button type="submit" class="btn btn-success" id="confirmUpdate">Confirm</button>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+<div class="text-center">
+      <h1>Clients</h1>
+      
+      <table class="table" id="clientsTable">
+         <thead>
+            <tr>
+             <th>Id</th>
+             <th>FirstName</th>
+             <th>LastName</th>
+             <th>Phone Number</th>
+             <th>Birthday</th>
+             </tr>
+         </thead>
+         <tbody>
+             
+         </tbody>
+          
+      </table>
+  </div>
+
+
+	
+
+
+
+<script type="text/javascript" src="public/js/jquery.min.js"></script>
+<script type="text/javascript" src="public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="public/js/datepicker.js"></script>
+<script src="https://unpkg.com/ionicons@4.4.7/dist/ionicons.js"></script>
+<script type="text/javascript" src="public/js/index.js"></script>
+<script>
+   let serverURL = "http://localhost:8080/clients/";
+    $(document).ready(function(){
+        getClients();
+             document.getElementById("confirmUpdate").disabled = true;
+            
+             if(token){
+
+$.ajaxSetup({
+        headers: {
+            'Authorization': 'Bearer ' + token
+        }
+    });
+
+$("#superNavbar").append(
+        `
+        <form class="form-inline">
+<ul class="navbar-nav justify-content-end">
+<li class="nav-item">
+<a href="index.html" id="logoutBtn" class="nav-link">Log out</a>
+</li>
+</ul>
+</form>
+        `
+        )
+
+let role = parseJwt(token).auth;
+if(role === "ROLE_ADMIN"){
+    $("#superNavbar").append(
+        `
+        <li class="nav-item">
+<a class="nav-link" href="admin.html">Admin</a>
+</li>
+        `
+        )
+}
+
+$('#logoutBtn').on('click', function(e) {
+        window.localStorage.removeItem('auth_token');
+        window.location.reload("notes.html");
+    });
+} else {
+    $("#superNavbar").append(
+        `
+        <ul class="navbar-nav justify-content-end">
+            <form class="form-inline">
+         <li class="nav-item">
+            <a href="register.html" class="nav-link">Sign Up</a>
+        </li>
+        <li class="nav-item">
+            <a href="signin.html" class="nav-link">Sign In</a>
+        </li>
+    </form>
+    </ul>
+        `
+        )
+
+}
+             
+           
+
+       $(document).on("click", "#clientsTable tbody button.btnUpdateClass", function(e){
+
+          console.log(e.target.id);
+        let elementId = e.target.id;
+        let clientId = elementId.split("-")[1];
+         getClientsById(clientId);
+
+       });
+
+       
+
+    });
+
+    function getClientsById(clientId){
+      
+        $.ajax({
+            url: serverURL + clientId,
+            method: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response){
+                
+              console.log(response);
+              document.getElementById("inputId").value=response.id;
+              document.getElementById("inputFirstName").value=response.firstName;
+              document.getElementById("inputLastName").value=response.lastName;
+              document.getElementById("inputPhoneNumber").value=response.phoneNumber;
+              document.getElementById("inputEmail").value=response.email;
+              document.getElementById("inputPassword").value=response.password;
+                
+                 }
+        });
+    };
+    
+     function getClients(){
+         
+        $.ajax({
+            url: serverURL,
+            method: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response){
+                console.log(response);
+                
+                $.each(response, function(key, value){
+                    
+
+                    $("#clientsTable tbody").append(
+                        `
+                        <tr>
+    
+                        <td>${value.id}</td>    
+                        <td>${value.firstName}</td>    
+                        <td>${value.lastName}</td>    
+                        <td>${value.phoneNumber}</td>    
+                        <td>${value.birthday}</td>    
+                        <td>
+                 <button class="btn btn-info btnUpdateClass" id="btnUpdate-${value.id}">Update</button>
+                            </td>
+                        
+                        </tr>
+                        `);
+                        
+                       
+                    
+                });
+            }
+        });
+    };
+
+     function addClient(){
+        let firstName = $("#inputFirstName").val();
+        let lastName = $("#inputLastName").val();
+        let phoneNumber = $("#inputPhoneNumber").val();
+        let birthday = $("#birthday").val();
+        let email = $("#inputEmail").val();
+        let password = $("#inputPassword").val();
+        
+       
+
+       let client = {
+            email: email,
+           password: password,
+        clientEntity: {
+            firstName: firstName,
+                lastName: lastName,
+                    phoneNumber: phoneNumber,
+                        birthday: birthday
+                            }
+                
+        };
+        
+
+        console.log(client);
+            
+            $.ajax({
+             
+                url: serverUrl + "logs",
+                method: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(client),
+                complete: function(data){
+                    if(data.status == 201){
+                        alert("Client Updated");
+                        $("clientsTable tbody").empty();
+                        getMasters();
+
+
+                        
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>

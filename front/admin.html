@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin</title>
+     <link rel="stylesheet" href="public/css/bootstrap.min.css">
+</head>
+<body>
+  
+   
+   <div class="container col-3" style="text-align: center; ">
+     <div class="row-3">
+     <div>
+      <h1>Admin</h1> 
+      <div class="form-group container" style="display: inline-block">
+    <a href="clients.html" class="btn btn-info btn-block" role="button">GetClients</a>
+     </div> 
+         <div class="form-group container" style="display: inline-block">
+    <a href="masterAdmin.html" class="btn btn-info btn-block" role="button">AddMaster</a>
+    </div> 
+       <div class="form-group container" style="display: inline-block">
+    <a href="serveices.html" class="btn btn-info btn-block" role="button">Services</a>
+    </div> 
+    <div class="form-group container" style="display: inline-block">
+         <a href="clients.html" class="btn btn-info btn-block" role="button">Notes</a>
+         </div>
+      </div>
+      </div>
+   </div>
+    
+    
+<script type="text/javascript" src="public/js/jquery.min.js"></script>
+<script type="text/javascript" src="public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="public/js/datepicker.js"></script>
+<script>
+$(document).ready(function(){
+   let token = window.localStorage.getItem("auth_token");
+        if(token){
+            let role = parseJwt(token).auth;
+            if(role === "ROLE_ADMIN"){
+                $("#superNavbar").append(
+                    `
+                    <li class="nav-item">
+        <a class="nav-link" href="admin.html">Admin</a>
+      </li>
+                    `
+                    )
+            }
+       
+            $.ajaxSetup({
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+           $('#logoutBtn').on('click', function(e) {
+                    window.localStorage.removeItem('auth_token');
+                    window.location.reload();
+                });
+            } else {
+                window.location.href="masters.html";
+            }
+      
+
+});
+
+
+         
+         function parseJwt(token){
+           var base64Url = token.split(".")[1];
+           var base64 = base64Url.replace("-", "+").replace("_", "/");
+           return JSON.parse(window.atob(base64));
+       };
+
+</script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <title>Shugaring</title>
+    <link rel="stylesheet" href="public/css/bootstrap.min.css">
+    <link rel="stylesheet" href="public/css/datepicker.css" type="text/css">
+    <link rel="stylesheet" href="public/css/foter.css">
+    <link href="https://unpkg.com/ionicons@4.4.7/dist/css/ionicons.min.css" rel="stylesheet">
+    
+</head>
+<body style="background-color: #fac3e8; height: 100%;">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="position: fixed; min-width: 100%; z-index: 1">
+        <a class="navbar-brand" href="index.html">Cosmetology</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav" id="superNavbar">
+            <li class="nav-item">
+              <a class="nav-link" href="Masters.html">Masters</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="notes.html">Note</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="helpfull.html">Helpfull</a>
+            </li>
+             <li class="nav-item">
+              <a class="nav-link" href="contacts.html">Contacts</a>
+             </li>
+          </ul>
+      </nav>
+        </div>
+      </nav>
+   
+   
+   <div class="container" style="display: block">
+   <div class="row" style="justify-content: center">
+   <div class="col-4" style="align-content: center; margin-top: 90px">
+    <form><h2 style="text-align: left">Select Master</h2>
+   <div class="form-group">
+  <select class="form-control text-light" id="masterSelect" style="background-color: darkslategray">
+    
+       </select>
+  </div>
+    </form>
+     <form><h2 style="text-align: left">Select Service</h2>
+   <div class="form-group">
+  <label for="sel1"></label>
+  <select class="form-control text-light" id="serviceSelect" style="background-color: darkslategray">
+  
+       </select>
+  </div>
+     </form>
+   <form><h2 style="text-align: left">Select Date</h2>
+   <div class="form-group">
+                   <input type="text" class="form-control text-light" id="dateNotes" name="daterange" style="background-color: darkslategray; margin-top: 30px" >
+                </div>
+  </form>
+  <form><h2 style="text-align: left">Select Time</h2>
+    <div class="form-group">
+                    <input type="text" class="form-control text-light" id="timeNotes" name="daterange" style="background-color: darkslategray; margin-top: 30px" >
+                 </div>
+   </form>
+  <div class="form-group" id="submit" style="text-align: right">
+       <button type="submit" class="btn btn-dark">Submit</button>
+  </div>
+    </form>
+    </div>
+    </div>
+    </div>
+   
+
+<div class="footer">
+	
+   
+		<div class="container" style="text-align: center; text-decoration-color: aliceblue">
+			
+			<a href="https://www.facebook.com/profile.php?id=100016259835742&__tn__=%2CdlC-R-R&eid=ARB1FDGnKBOQlVabuFzQi6UVrnjXP0sbI5EstcFpnDYYUgunMMLCACCsNyEPel0fDCCZaYGLQ738-gkI&hc_ref=ARQITm-0tEXs_7D390oh77ahML_ZZNw4GXgxlVTUSA_9teg4EY9_DzCLAv4CiPb52DI"><ion-icon name="logo-facebook"></ion-icon></a>
+			<a href="https://www.instagram.com/sugaring_visk_lviv/?hl=uk"><ion-icon name="logo-instagram"></ion-icon></a>
+			<a href="https://t.me/AnnaHnativ"><ion-icon name="logo-whatsapp"></ion-icon></a>
+			
+			
+
+		</div>
+        
+</div>
+
+<script type="text/javascript" src="public/js/jquery.min.js"></script>
+<script type="text/javascript" src="public/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="public/js/datepicker.js"></script>
+<script src="https://unpkg.com/ionicons@4.4.7/dist/ionicons.js"></script>
+<script>
+$(document).ready(function(){
+   
+    $("#dateNotes").datepicker({
+        language: "ua",
+        firstDay: "1"
+    
+    });
+
+    $("#timeNotes").datepicker({
+        timepicker : true,
+        onlyTimepicker: true,
+        timeFormat: "hh:ii",
+        minHours: 9,
+        maxHours: 21,
+        minutesStep: 15
+    
+    });
+
+
+
+getMasters();
+getServices();
+
+        let token = window.localStorage.getItem("auth_token");
+        if(token){
+
+            $.ajaxSetup({
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+
+            $("#superNavbar").append(
+                    `
+                    <form class="form-inline">
+<ul class="navbar-nav justify-content-end">
+<li class="nav-item">
+<a href="index.html" id="logoutBtn" class="nav-link">Log out</a>
+</li>
+</ul>
+</form>
+                    `
+                    )
+            
+            let role = parseJwt(token).auth;
+            if(role === "ROLE_ADMIN"){
+                $("#superNavbar").append(
+                    `
+                    <li class="nav-item">
+        <a class="nav-link" href="admin.html">Admin</a>
+      </li>
+                    `
+                    )
+            }
+       
+           $('#logoutBtn').on('click', function(e) {
+                    window.localStorage.removeItem('auth_token');
+                    window.location.reload("notes.html");
+                });
+            } else {
+                $("#superNavbar").append(
+                    `
+                   
+    <ul class="navbar-nav justify-content-end">
+            <form class="form-inline">
+         <li class="nav-item">
+            <a href="register.html" class="nav-link">Sign Up</a>
+        </li>
+        <li class="nav-item">
+            <a href="signin.html" class="nav-link">Sign In</a>
+        </li>
+    </form>
+    </ul>
+
+                    `
+                    )
+
+            }
+        });
+
+         
+         function parseJwt(token){
+           var base64Url = token.split(".")[1];
+           var base64 = base64Url.replace("-", "+").replace("_", "/");
+           return JSON.parse(window.atob(base64));
+       };
+
+
+function getMasters(){
+        $.ajax({
+            url: "http://localhost:8080/masters/",
+            method: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response){
+                console.log(response);
+                
+                $.each(response, function(key, value){
+                   
+                 
+                 document.getElementById("masterSelect").value = response.id;
+                 document.getElementById("masterSelect").value = response.firstName;
+                        
+                 $('#masterSelect').append(
+                            `
+                            <option value =${value.id}>${value.firstName}</option>
+                            `);   
+                    
+                });
+            }
+        });
+    };
+
+    function getServices(){
+        $.ajax({
+            url: "http://localhost:8080/services",
+            method: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response){
+            console.log(response);
+                
+                $.each(response, function(key, value){
+                    
+                    document.getElementById("serviceSelect").value=response.id;
+                    document.getElementById("serviceSelect").value=response.nameProcedure;
+
+                    $("#serviceSelect").append(
+                        `
+                        <option value = ${value.id}>${value.nameProcedure}</option>
+                        `);
+                        
+                       
+                    
+                });
+            }
+        });
+    };
+
+    function addNotes(){
+
+          
+        let idClients = $("#inputFirstName").val();
+        let idMaster = $("#serviceSelect").val();
+        let idService = $("#inputLastName").val();
+        let date = $("#inputPhoneNumber").val();
+        let time = $("#birthday").val();
+        
+        
+       
+
+       let note = {
+        clientEntity: {
+            id : idClients
+            },
+            masterEntity: {
+                id : idMaster
+                },
+                serviceEntity: {
+                   id : [idService]
+                },
+                date: date,
+                time: time
+                
+        };
+        
+
+        console.log(client);
+            
+            $.ajax({
+             
+                url: serverUrl,
+                method: "POST",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(client),
+                complete: function(data){
+                    if(data.status == 201){
+                        alert("OK");
+                        window.location.href="index.html";
+
+                        
+                    }
+                }
+            });
+    
+
+
+      
+    };
+</script>
+</body>
+</html>
